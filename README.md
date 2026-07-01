@@ -1,5 +1,8 @@
 # The Registry — Caleb University Student FAQ Chatbot
 
+**Live demo:** https://caleb-faq-bot.netlify.app  
+**GitHub:** https://github.com/Greatmathew7/caleb-faq-bot
+
 AI-powered FAQ chatbot for Caleb University students. React (Vite) frontend +
 a Netlify serverless function that calls Google's Gemini API, so your API key
 never touches the browser. Gemini has a genuine no-card free tier, so this

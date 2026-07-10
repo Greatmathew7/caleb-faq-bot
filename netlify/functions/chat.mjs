@@ -1,13 +1,4 @@
-// netlify/functions/chat.js
-//
-// Serverless endpoint the React app calls at POST /.netlify/functions/chat
-// It keeps GEMINI_API_KEY off the client and grounds answers in the
-// FAQ_KNOWLEDGE block below. Edit that block with real, up-to-date info —
-// anything marked [VERIFY] should be confirmed against the official school
-// portal before you trust it in production.
-//
-// Uses Google's Gemini API (generativelanguage.googleapis.com), which has a
-// genuine no-card free tier — good fit for a demo with no real traffic.
+// netlify/functions/chat.mjs
 
 const FAQ_KNOWLEDGE = `
 You are the AI help desk for Caleb University (CUL), a private university in
@@ -65,10 +56,12 @@ STAFF DIRECTORY (STF-601)
 - Bursar: Mr. Adesina Abubakre.
 - University Librarian: Mr. Josiah Adeyomoye.
 - Acting Head of Department, Computer Science: Dr. Ayorinde P. Oduroye (assumed role November 2025).
-- Prof. Moses Kehinde Aregbesola: Professor in the Computer Science department,
-  with expertise in AI, Cloud Computing, Cybersecurity, and Software Engineering.
-- Dean, College of Pure and Applied Sciences (COPAS): Prof. Kehinde Gunniran.
+- Prof. Moses Kehinde Aregbesola (also known as Prof. K. Moses Aregbesola): Professor in the
+  Computer Science department, with expertise in AI, Cloud Computing, Cybersecurity, and
+  Software Engineering.
+- Dean, College of Pure and Applied Sciences (COPAS): Prof. K. Moses Aregbesola.
 - Dean, College of Postgraduate Studies (COPOS): Prof. Teju Somorin.
+- [VERIFY the deans of COCIS, COLENSMA, CASMAS, and COCOMAS if a student asks specifically.]
 
 HOW TO ANSWER
 - Be concise and direct — 2-5 sentences, no long essays.
@@ -86,7 +79,7 @@ const CATEGORY_KEYWORDS = [
   { code: 'REG-301', words: ['register', 'registration', 'course form', 'add', 'drop', 'adviser', 'advisor', 'level adviser', 'level advisor'] },
   { code: 'EXM-401', words: ['exam', 'exams', 'result', 'results', 'gpa', 'cgpa', 'probation', 'make-up', 'makeup', 'transcript score', 'grade', 'first class', 'second class'] },
   { code: 'GEN-501', words: ['hostel', 'accommodation', 'id card', 'id card checker', 'calendar', 'campus', 'club', 'transcript', 'shuttle'] },
-  { code: 'STF-601', words: ['vice chancellor', 'registrar', 'bursar', 'librarian', 'dean', 'hod', 'head of department', 'aregbesola', 'staff', 'dvc', 'oduroye', 'asikhia', 'adewale', 'ajayi', 'olumeru', 'abubakre', 'adeyomoye', 'gunniran', 'somorin', 'who is', 'professor'] },
+  { code: 'STF-601', words: ['vice chancellor', 'registrar', 'bursar', 'librarian', 'dean', 'hod', 'head of department', 'aregbesola', 'staff', 'dvc', 'oduroye', 'asikhia', 'adewale', 'ajayi', 'olumeru', 'abubakre', 'adeyomoye', 'somorin', 'who is', 'professor'] },
 ]
 
 function detectCategory(text) {

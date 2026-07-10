@@ -47,4 +47,13 @@ export const categories = [
       'Who do I contact for ID card issues?',
     ],
   },
+  {
+    code: 'STF-601',
+    label: 'Staff Directory',
+    prompts: [
+      'Who is the Vice Chancellor of Caleb University?',
+      'Who is the Head of Department for Computer Science?',
+      'Who is the Dean of COPAS?',
+    ],
+  },
 ]

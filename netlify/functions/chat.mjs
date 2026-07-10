@@ -57,6 +57,19 @@ CAMPUS LIFE (GEN-501)
   ready for pickup. [VERIFY the exact ID card portal URL if a student asks.]
 - [VERIFY the hostel application process and where the academic calendar is published.]
 
+STAFF DIRECTORY (STF-601)
+- Vice-Chancellor: Prof. Olalekan Asikhia.
+- Deputy Vice-Chancellor (Academic): Prof. Sunday Adewale.
+- Deputy Vice-Chancellor (RISA — Research, Innovation, Strategy & Administration): Prof. Adesola Ajayi.
+- Registrar: Mr. Mayokun Olumeru.
+- Bursar: Mr. Adesina Abubakre.
+- University Librarian: Mr. Josiah Adeyomoye.
+- Acting Head of Department, Computer Science: Dr. Ayorinde P. Oduroye (assumed role November 2025).
+- Prof. Moses Kehinde Aregbesola: Professor in the Computer Science department,
+  with expertise in AI, Cloud Computing, Cybersecurity, and Software Engineering.
+- Dean, College of Pure and Applied Sciences (COPAS): Prof. Kehinde Gunniran.
+- Dean, College of Postgraduate Studies (COPOS): Prof. Teju Somorin.
+
 HOW TO ANSWER
 - Be concise and direct — 2-5 sentences, no long essays.
 - If the honest answer depends on a figure or date marked [VERIFY] above,
@@ -73,6 +86,7 @@ const CATEGORY_KEYWORDS = [
   { code: 'REG-301', words: ['register', 'registration', 'course form', 'add', 'drop', 'adviser', 'advisor', 'level adviser', 'level advisor'] },
   { code: 'EXM-401', words: ['exam', 'exams', 'result', 'results', 'gpa', 'cgpa', 'probation', 'make-up', 'makeup', 'transcript score', 'grade', 'first class', 'second class'] },
   { code: 'GEN-501', words: ['hostel', 'accommodation', 'id card', 'id card checker', 'calendar', 'campus', 'club', 'transcript', 'shuttle'] },
+  { code: 'STF-601', words: ['vice chancellor', 'registrar', 'bursar', 'librarian', 'dean', 'hod', 'head of department', 'aregbesola', 'staff', 'dvc', 'oduroye', 'asikhia', 'adewale', 'ajayi', 'olumeru', 'abubakre', 'adeyomoye', 'gunniran', 'somorin', 'who is', 'professor'] },
 ]
 
 function detectCategory(text) {
@@ -112,8 +126,6 @@ export const handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'message is required' }) }
   }
 
-  // Gemini expects history as {role: 'user'|'model', parts: [{text}]} —
-  // note it's "model", not "assistant".
   const contents = [
     ...history.map((h) => ({
       role: h.role === 'assistant' ? 'model' : 'user',
@@ -122,12 +134,6 @@ export const handler = async (event) => {
     { role: 'user', parts: [{ text: message.slice(0, 2000) }] },
   ]
 
-  // Gemini occasionally returns 503 "model is overloaded" during demand
-  // spikes — this is transient and unrelated to your key/setup. We handle
-  // it two ways: (1) retry the same model a couple of times with a short
-  // delay, and (2) if it's STILL overloaded, fall back to a second model
-  // that usually has separate capacity. Together, a brief spike should be
-  // invisible to whoever's watching the demo instead of showing an error.
   const MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite']
   const ATTEMPTS_PER_MODEL = 2
   const RETRY_DELAY_MS = 1000
@@ -175,24 +181,15 @@ export const handler = async (event) => {
         const isQuotaExhausted = response.status === 429 || lastErrorText.includes('RESOURCE_EXHAUSTED')
 
         if (isOverloaded && attempt < ATTEMPTS_PER_MODEL) {
-          // Transient capacity blip — short delay, retry same model.
           await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS * attempt))
           continue
         }
         if (isQuotaExhausted) {
-          // This model's daily/per-minute quota is used up — retrying the
-          // same model won't help until it resets. Skip straight to the
-          // next model in the fallback chain, which has its own separate
-          // quota bucket, instead of wasting attempts here.
           break
         }
         if (!isOverloaded) {
-          // Some other non-retryable error (bad key, bad request, etc.) —
-          // give up now, no point trying the fallback model for this.
           return { statusCode: 502, body: JSON.stringify({ error: 'Upstream API error' }) }
         }
-        // Overloaded and out of attempts for this model — fall through to
-        // the next model in MODELS (the outer loop), if any remain.
       } catch (err) {
         console.error('Function error:', err)
         return { statusCode: 500, body: JSON.stringify({ error: 'Server error' }) }
@@ -200,7 +197,6 @@ export const handler = async (event) => {
     }
   }
 
-  // Every model in the fallback chain was overloaded or quota-exhausted.
   console.error('All models exhausted/overloaded:', lastErrorText)
   return { statusCode: 502, body: JSON.stringify({ error: 'Upstream API error' }) }
 }
